@@ -23,10 +23,39 @@ public class Repository
     }
 
 
-    public Book CreateBook(string title, string publisher, string coverImgUrl)
+    public Book CreateBook(Book book)
     {
-        throw new NotImplementedException();
+        var sql = "INSERT INTO library.books (title, publisher, coverimgurl) " +
+                  "VALUES (@title, @publisher, @coverimgurl)" +
+                  "RETURNING *";
+
+        using (var conn = _dataSource.OpenConnection())
+        {
+            return conn.QueryFirst<Book>(sql, new { book.Title, book.Publisher, book.CoverImgUrl });
+        }
     }
 
+    public Book UpdateBook(Book book, int bookid)
+    {
+        var sql = "UPDATE library.books " +
+                  "SET title = @title, publisher = @publisher, coverimgurl = @coverimgurl " +
+                  "WHERE bookid = @bookid " +
+                  "RETURNING *;";
 
+        using (var conn = _dataSource.OpenConnection())
+        {
+            return conn.QueryFirst<Book>(sql, new { book.Title, book.Publisher, book.CoverImgUrl, bookid });
+        }
+    }
+
+    public object DeleteBook(int bookId)
+    {
+        var sql = "DELETE FROM library.books " +
+                  "WHERE bookid = @bookId;";
+
+        using (var conn = _dataSource.OpenConnection())
+        {
+            return conn.Execute(sql, new { bookId }) == 1;
+        }
+    }
 }
