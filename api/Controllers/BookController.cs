@@ -41,6 +41,4 @@ public class BookController : ControllerBase
     {
         return _service.DeleteBook(bookId);
     }
-
-
 }
